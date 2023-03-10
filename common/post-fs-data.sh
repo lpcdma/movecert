@@ -12,6 +12,14 @@ MODDIR=${0%/*}
 
 # mv -f /data/misc/user/0/cacerts-added/12abc345.0 $MODDIR/system/etc/security/cacerts
 
+su -c "resetprop ro.debuggable 1"
+su -c "resetprop ro.boot.verifiedbootstate orange" # 修改解锁状态
+su -c "resetprop service.adb.root 1" # 减少调用 adb root
+su -c "magiskpolicy --live 'allow adbd adbd process setcurrent'" # 配置缺少的权限
+su -c "magiskpolicy --live 'allow adbd su process dyntransition'" # 配置缺少的权限
+su -c "magiskpolicy --live 'permissive { su }'" # 将 su 配置为 permissive，防止后续命令执行缺少权限
+su -c "pkill -9 adbd" # 杀掉 adbd
+
 cp -f /data/misc/user/0/cacerts-added/* $MODDIR/system/etc/security/cacerts
 chown -R 0:0 $MODDIR/system/etc/security/cacerts
 
